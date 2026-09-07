@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('WISH_CANDLE_VERSION', '0.1.1');
+define('WISH_CANDLE_VERSION', '0.1.2');
 define('WISH_CANDLE_ASSET_CDN', 'https://nataliwisher.com/wish-candle/assets');
 
 function wish_candle_setup() {

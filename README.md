@@ -94,6 +94,19 @@ To rebuild the theme archive locally:
 ./wordpress-theme/build-theme.sh
 ```
 
+### Updating the theme on Lightsail
+
+If the WordPress upload screen cannot replace the active theme, update it from the Bitnami SSH terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wisheradam/wish-candle/main/wordpress-theme/wish-candle.zip -o /tmp/wish-candle-theme.zip
+sudo /opt/bitnami/wp-cli/bin/wp theme install /tmp/wish-candle-theme.zip --force --activate --path=/opt/bitnami/wordpress --allow-root
+sudo chown -R bitnami:daemon /opt/bitnami/wordpress/wp-content/themes/wish-candle
+sudo /opt/bitnami/wp-cli/bin/wp theme get wish-candle --field=version --path=/opt/bitnami/wordpress --allow-root
+```
+
+The custom theme declares its GitHub repository as the update source so WordPress does not replace it with a similarly named theme from the public catalog.
+
 ## WooCommerce category slugs
 
 The homepage links expect these product category slugs:
