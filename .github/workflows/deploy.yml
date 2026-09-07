@@ -21,7 +21,11 @@ jobs:
           test -s dist/index.html
           test -s dist/site.css
           test -s dist/site.js
-          for page in about shop contacts wholesale category privacy-policy delivery-terms; do test -s "dist/$page/index.html"; done
+          BASE_PAGES="about shop contacts wholesale category privacy-policy delivery-terms"
+          CATEGORY_PAGES="shaped-candles candle-gift-sets candles-in-jars candlesticks candle-accessories home-fragrances sales massage-candles"
+          for page in $BASE_PAGES $CATEGORY_PAGES; do
+            test -s "dist/$page/index.html"
+          done
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::533267008693:role/NataliPortfolioGitHubDeploy
@@ -38,7 +42,9 @@ jobs:
           aws s3api put-object --bucket nataliwisher-portfolio-533267008693 --key 'wish-candle/' \
             --body dist/index.html --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' >/dev/null
 
-          for page in about shop contacts wholesale category privacy-policy delivery-terms; do
+          BASE_PAGES="about shop contacts wholesale category privacy-policy delivery-terms"
+          CATEGORY_PAGES="shaped-candles candle-gift-sets candles-in-jars candlesticks candle-accessories home-fragrances sales massage-candles"
+          for page in $BASE_PAGES $CATEGORY_PAGES; do
             aws s3 cp "dist/$page/index.html" "s3://nataliwisher-portfolio-533267008693/wish-candle/$page" \
               --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' --no-progress
             aws s3api put-object --bucket nataliwisher-portfolio-533267008693 --key "wish-candle/$page/" \
@@ -55,9 +61,17 @@ jobs:
           grep -q 'data-page="home"' /tmp/home.html
           curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/site.css -o /tmp/site.css
           curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/site.js -o /tmp/site.js
+
           for page in about shop contacts wholesale category privacy-policy delivery-terms; do
             curl --fail --silent --show-error --retry 3 "https://nataliwisher.com/wish-candle/$page" -o "/tmp/$page.html"
             grep -q "data-page=\"$page\"" "/tmp/$page.html"
           done
+
+          for page in shaped-candles candle-gift-sets candles-in-jars candlesticks candle-accessories home-fragrances sales massage-candles; do
+            curl --fail --silent --show-error --retry 3 "https://nataliwisher.com/wish-candle/$page" -o "/tmp/$page.html"
+            grep -q 'data-page="category"' "/tmp/$page.html"
+            grep -q "data-category=\"$page\"" "/tmp/$page.html"
+          done
+
           curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/assets/hero.png -o /tmp/hero
           test -s /tmp/hero
