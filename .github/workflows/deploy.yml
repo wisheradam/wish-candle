@@ -9,40 +9,55 @@ permissions:
   id-token: write
 concurrency:
   group: wish-candle-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-      - name: Validate entrypoint
-        run: test -s dist/index.html
+      - name: Validate site files
+        run: |
+          test -s dist/index.html
+          test -s dist/site.css
+          test -s dist/site.js
+          for page in about shop contacts wholesale category privacy-policy delivery-terms; do test -s "dist/$page/index.html"; done
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::533267008693:role/NataliPortfolioGitHubDeploy
           aws-region: us-east-1
-      - name: Upload Wish Candle page
+      - name: Upload complete Wish Candle site
         run: |
-          aws s3 cp dist/index.html s3://nataliwisher-portfolio-533267008693/wish-candle/index.html \
-            --content-type 'text/html; charset=utf-8' \
+          aws s3 sync dist/ s3://nataliwisher-portfolio-533267008693/wish-candle/ \
             --cache-control 'public,max-age=300' \
             --no-progress
+
+          # Clean root URLs: CloudFront + S3 REST origin do not resolve nested index files automatically.
           aws s3 cp dist/index.html s3://nataliwisher-portfolio-533267008693/wish-candle \
-            --content-type 'text/html; charset=utf-8' \
-            --cache-control 'public,max-age=300' \
-            --no-progress
-          aws s3api put-object \
-            --bucket nataliwisher-portfolio-533267008693 \
-            --key 'wish-candle/' \
-            --body dist/index.html \
-            --content-type 'text/html; charset=utf-8' \
-            --cache-control 'public,max-age=300' >/dev/null
+            --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' --no-progress
+          aws s3api put-object --bucket nataliwisher-portfolio-533267008693 --key 'wish-candle/' \
+            --body dist/index.html --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' >/dev/null
+
+          for page in about shop contacts wholesale category privacy-policy delivery-terms; do
+            aws s3 cp "dist/$page/index.html" "s3://nataliwisher-portfolio-533267008693/wish-candle/$page" \
+              --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' --no-progress
+            aws s3api put-object --bucket nataliwisher-portfolio-533267008693 --key "wish-candle/$page/" \
+              --body "dist/$page/index.html" --content-type 'text/html; charset=utf-8' --cache-control 'public,max-age=300' >/dev/null
+          done
       - name: Refresh CDN
         run: |
-          INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id E1LBCAP3SYQ78D --paths '/wish-candle' '/wish-candle/' '/wish-candle/*' --query 'Invalidation.Id' --output text)
+          INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id E1LBCAP3SYQ78D --paths '/wish-candle*' '/wish-candle/*' --query 'Invalidation.Id' --output text)
           aws cloudfront wait invalidation-completed --distribution-id E1LBCAP3SYQ78D --id "$INVALIDATION_ID"
-      - name: Verify published page
+      - name: Verify production routes
         run: |
-          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle -o /tmp/live.html
-          cmp dist/index.html /tmp/live.html
+          set -e
+          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle -o /tmp/home.html
+          grep -q 'data-page="home"' /tmp/home.html
+          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/site.css -o /tmp/site.css
+          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/site.js -o /tmp/site.js
+          for page in about shop contacts wholesale category privacy-policy delivery-terms; do
+            curl --fail --silent --show-error --retry 3 "https://nataliwisher.com/wish-candle/$page" -o "/tmp/$page.html"
+            grep -q "data-page=\"$page\"" "/tmp/$page.html"
+          done
+          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle/assets/hero.png -o /tmp/hero
+          test -s /tmp/hero
