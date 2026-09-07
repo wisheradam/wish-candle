@@ -1,0 +1,48 @@
+name: Deploy Wish Candle to Natali hosting
+on:
+  push:
+    branches: [main]
+    paths: ['dist/**', '.github/workflows/deploy.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: wish-candle-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate entrypoint
+        run: test -s dist/index.html
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::533267008693:role/NataliPortfolioGitHubDeploy
+          aws-region: us-east-1
+      - name: Upload Wish Candle page
+        run: |
+          aws s3 cp dist/index.html s3://nataliwisher-portfolio-533267008693/wish-candle/index.html \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public,max-age=300' \
+            --no-progress
+          aws s3 cp dist/index.html s3://nataliwisher-portfolio-533267008693/wish-candle \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public,max-age=300' \
+            --no-progress
+          aws s3api put-object \
+            --bucket nataliwisher-portfolio-533267008693 \
+            --key 'wish-candle/' \
+            --body dist/index.html \
+            --content-type 'text/html; charset=utf-8' \
+            --cache-control 'public,max-age=300' >/dev/null
+      - name: Refresh CDN
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id E1LBCAP3SYQ78D --paths '/wish-candle' '/wish-candle/' '/wish-candle/*' --query 'Invalidation.Id' --output text)
+          aws cloudfront wait invalidation-completed --distribution-id E1LBCAP3SYQ78D --id "$INVALIDATION_ID"
+      - name: Verify published page
+        run: |
+          curl --fail --silent --show-error --retry 3 https://nataliwisher.com/wish-candle -o /tmp/live.html
+          cmp dist/index.html /tmp/live.html
