@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wish Candle</title>
+  <meta name="description" content="Wish Candle" />
+  <style>
+    :root{color-scheme:light;--bg:#f7f1e7;--ink:#211b16;--muted:#74685d;--glass:rgba(255,255,255,.48);--line:rgba(55,39,24,.10)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:radial-gradient(circle at 50% 28%,#fff7d7 0,#f7f1e7 34%,#eee5d8 100%);color:var(--ink)}
+    body{min-height:100vh;display:grid;place-items:center;overflow:hidden}
+    .wrap{position:relative;width:min(1120px,calc(100% - 32px));min-height:min(760px,calc(100vh - 32px));display:grid;place-items:center;border:1px solid var(--line);border-radius:36px;background:var(--glass);backdrop-filter:blur(28px);box-shadow:0 30px 100px rgba(66,44,24,.14);overflow:hidden}
+    .glow{position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(255,211,98,.55),rgba(255,193,70,.14) 48%,transparent 72%);filter:blur(10px);top:7%;left:50%;transform:translateX(-50%)}
+    .candle{position:absolute;top:19%;left:50%;transform:translateX(-50%);width:82px;height:190px;border-radius:34px 34px 20px 20px;background:linear-gradient(90deg,#f3dfba,#fff4da 45%,#e8cfa5);box-shadow:0 28px 70px rgba(123,78,21,.16)}
+    .flame{position:absolute;left:50%;top:-60px;width:38px;height:64px;transform:translateX(-50%) rotate(7deg);border-radius:58% 42% 60% 40%;background:radial-gradient(circle at 50% 70%,#fff8c5 0 13%,#ffc84e 30%,#f4832e 68%,rgba(244,131,46,0) 72%);filter:drop-shadow(0 0 22px rgba(255,169,54,.8));animation:flicker 2.4s ease-in-out infinite alternate}
+    .content{position:relative;z-index:2;text-align:center;margin-top:260px;padding:32px}
+    .eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+    h1{font-size:clamp(56px,9vw,112px);line-height:.92;letter-spacing:-.055em;margin:0;font-weight:600}
+    p{margin:22px auto 0;max-width:520px;font-size:clamp(17px,2vw,22px);line-height:1.45;color:var(--muted)}
+    .pill{display:inline-flex;margin-top:30px;padding:12px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.45);font-size:14px;color:#55493e}
+    @keyframes flicker{0%{transform:translateX(-50%) rotate(3deg) scale(.97)}100%{transform:translateX(-50%) rotate(-5deg) scale(1.04)}}
+    @media (max-width:640px){.wrap{min-height:calc(100vh - 24px);border-radius:28px}.candle{top:16%;width:68px;height:160px}.content{margin-top:235px}.glow{width:320px;height:320px}}
+    @media (prefers-reduced-motion:reduce){.flame{animation:none}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="candle" aria-hidden="true"><div class="flame"></div></div>
+    <section class="content">
+      <div class="eyebrow">Natalie Wisher · Product Design</div>
+      <h1>Wish Candle</h1>
+      <p>The project page is being prepared from the final Figma design.</p>
+      <div class="pill">Coming soon</div>
+    </section>
+  </main>
+</body>
+</html>
