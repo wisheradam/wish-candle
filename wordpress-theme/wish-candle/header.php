@@ -7,7 +7,7 @@
   <div class="header-top"><a class="phone" href="tel:<?php echo esc_attr(preg_replace('/[^+0-9]/', '', get_theme_mod('wish_phone', '+972 553 161 567'))); ?>"><?php echo esc_html(get_theme_mod('wish_phone', '+972 553 161 567')); ?></a><span></span><div class="language"><?php echo esc_html(strtoupper(substr(get_locale(), 0, 2))); ?> <span>⌄</span></div></div>
   <div class="brand-row">
     <div class="socials"><a href="<?php echo esc_url(get_theme_mod('wish_facebook', '#')); ?>" aria-label="Facebook">f</a><a href="<?php echo esc_url(get_theme_mod('wish_instagram', '#')); ?>" aria-label="Instagram">i</a></div>
-    <?php if (has_custom_logo()) { the_custom_logo(); } else { ?><a href="<?php echo esc_url(home_url('/')); ?>" aria-label="Wish Candle home"><img class="brand-logo" src="<?php echo wish_candle_asset('logo.png'); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>"></a><?php } ?>
+    <?php if (has_custom_logo()) { the_custom_logo(); } else { ?><a class="brand-wordmark" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Wish Candle home"><strong>WISH</strong><small>soy candle</small></a><?php } ?>
     <div class="header-icons">
       <button class="icon-btn search-btn" aria-label="Search" type="button">⌕</button>
       <a class="icon-btn wishlist-btn" href="<?php echo esc_url(home_url('/wishlist/')); ?>" aria-label="Wishlist">♡</a>
@@ -18,4 +18,4 @@
   </div>
   <nav class="nav-row" aria-label="Primary"><?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'items_wrap' => '<ul class="nav-links">%3$s</ul>', 'fallback_cb' => 'wish_candle_menu_fallback']); ?></nav>
 </header>
-<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile primary"><button class="close-menu" type="button" aria-label="Close menu" data-close-menu>×</button><?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'items_wrap' => '<ul class="mobile-nav-links">%3$s</ul>', 'fallback_cb' => 'wish_candle_menu_fallback']); ?></nav>
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile primary"><button class="close-menu" type="button" aria-label="Close menu" data-close-menu>×</button><?php wp_nav_menu(['theme_location' => 'primary', 'container' => false, 'items_wrap' => '<ul class="mobile-nav-links">%3$s</ul>', 'fallback_cb' => 'wish_candle_mobile_menu_fallback']); ?></nav>

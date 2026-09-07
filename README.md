@@ -39,7 +39,8 @@ wordpress-theme/
 - AWS Lightsail instance: `wishcandle-wordpress`
 - Region / Availability Zone: `eu-central-1a`
 - Lightsail plan: `micro_3_0` (USD 7/month at creation time)
-- WordPress blueprint: Bitnami WordPress 6.9.4
+- WordPress: 7.1 (updated from the original Bitnami image)
+- WooCommerce: 11.1.0, installed and active
 - Static public IP: `63.184.152.222`
 - Origin hostname: `origin-wp.wishcandle.shop`
 - Public hostname: `wp.wishcandle.shop`
@@ -49,6 +50,8 @@ wordpress-theme/
 - DNS: Amazon Route 53; domain remains registered with Dynadot
 
 The public WordPress hostname points to CloudFront. CloudFront connects to the Lightsail origin over HTTP, while visitors use HTTPS.
+
+CloudFront sends `X-Forwarded-Proto: https` to the origin. WordPress is configured with `WP_HOME` and `WP_SITEURL` set to `https://wp.wishcandle.shop`, proxy HTTPS detection enabled, and `FORCE_SSL_ADMIN` enabled.
 
 ## WordPress theme
 
@@ -70,6 +73,8 @@ https://nataliwisher.com/wish-candle/assets/
 ```
 
 This avoids duplicating the image library while staging is being assembled. The assets can be moved into WordPress or a dedicated CDN before the final cutover.
+
+The **Wish Candle** theme is installed and active on staging. The store remains in WooCommerce **Coming soon** mode. Products, payments, taxes, shipping, transactional email, legal pages and final business details still require configuration and testing before launch.
 
 ## Installing the theme
 

@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-define('WISH_CANDLE_VERSION', '0.1.0');
+define('WISH_CANDLE_VERSION', '0.1.1');
 define('WISH_CANDLE_ASSET_CDN', 'https://nataliwisher.com/wish-candle/assets');
 
 function wish_candle_setup() {
@@ -58,12 +58,27 @@ function wish_candle_customize($customizer) {
 add_action('customize_register', 'wish_candle_customize');
 
 function wish_candle_menu_fallback() {
-    echo '<a href="' . esc_url(home_url('/')) . '">Home</a>';
-    echo '<a href="' . esc_url(home_url('/about/')) . '">About us</a>';
-    echo '<a href="' . esc_url(function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/')) . '">Shop</a>';
-    echo '<a href="' . esc_url(home_url('/wholesale/')) . '">Wholesales</a>';
-    echo '<a href="' . esc_url(home_url('/blog/')) . '">Blog</a>';
-    echo '<a href="' . esc_url(home_url('/contacts/')) . '">Contacts</a>';
+    echo '<ul class="nav-links">' . wish_candle_fallback_menu_items() . '</ul>';
+}
+
+function wish_candle_mobile_menu_fallback() {
+    echo '<ul class="mobile-nav-links">' . wish_candle_fallback_menu_items() . '</ul>';
+}
+
+function wish_candle_fallback_menu_items() {
+    $items = [
+        ['Home', home_url('/')],
+        ['About us', home_url('/about/')],
+        ['Shop', function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/shop/')],
+        ['Wholesales', home_url('/wholesale/')],
+        ['Blog', home_url('/blog/')],
+        ['Contacts', home_url('/contacts/')],
+    ];
+    $html = '';
+    foreach ($items as $item) {
+        $html .= '<li class="menu-item"><a href="' . esc_url($item[1]) . '">' . esc_html($item[0]) . '</a></li>';
+    }
+    return $html;
 }
 
 function wish_candle_loop_columns() { return 4; }
